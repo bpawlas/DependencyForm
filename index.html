@@ -325,6 +325,57 @@
             const day = String(today.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         };
+        
+        /**
+         * NEW: Formats a number string to include commas and a decimal point.
+         * @param {string} value - The input value.
+         * @returns {string} The formatted number string.
+         */
+        const formatNumberWithCommas = (value) => {
+            if (!value) return '';
+            
+            // Remove all non-digit and non-decimal characters
+            let cleanValue = value.replace(/[^\d.]/g, '');
+            
+            // Split into integer and decimal parts
+            let parts = cleanValue.split('.');
+            let integerPart = parts[0];
+            let decimalPart = parts[1];
+            
+            // Add commas to the integer part
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            // Reconstruct the number
+            if (decimalPart !== undefined) {
+                // Allow only two decimal places
+                decimalPart = decimalPart.substring(0, 2);
+                return `${integerPart}.${decimalPart}`;
+            } else {
+                return integerPart;
+            }
+        };
+
+        /**
+         * NEW: Event handler for formatting number inputs on the fly.
+         * @param {Event} event - The input event.
+         */
+        const onNumberInput = (event) => {
+            const input = event.target;
+            const originalValue = input.value;
+            const cursorPosition = input.selectionStart;
+            
+            const formattedValue = formatNumberWithCommas(originalValue);
+            
+            input.value = formattedValue;
+            
+            // Adjust cursor position after formatting
+            const newCursorPosition = cursorPosition + (formattedValue.length - originalValue.length);
+            // Ensure cursor position is valid
+            if(newCursorPosition >= 0) {
+                 input.setSelectionRange(newCursorPosition, newCursorPosition);
+            }
+        };
+
 
         /**
          * Resets the entire form fields.
@@ -357,8 +408,8 @@
             document.getElementById('financialSupportDetails').classList.add('hidden');
             // MODIFIED: Ensure Spouse Section is VISIBLE on reset (matching the default empty state)
             document.getElementById('section-b-wrapper').classList.remove('hidden');
-            // MODIFIED: Ensure Section E is HIDDEN on reset (as marital status is blank)
-            document.getElementById('section-e-wrapper').classList.add('hidden');
+            // MODIFIED: Ensure Section E is VISIBLE on reset (as marital status is blank)
+            updateSectionEVisibility(); // This will correctly hide/show based on default blank values
             
             // NEW: Hide conditional spouse fields on reset
             document.getElementById('spouseAgencyDetails').classList.add('hidden');
@@ -693,9 +744,10 @@
             const category = document.getElementById('appointmentCategory').value;
             const categoryVisible = !['General Service', 'National Officer'].includes(category);
             
-            // Condition 2: Marital Status must be Single, Divorced, Legally Separated, or Widowed
+            // Condition 2: Marital Status
             const status = document.getElementById('staffMaritalStatus').value;
-            const maritalVisible = ['Single', 'Divorced', 'Legally Separated', 'Widowed'].includes(status);
+            // MODIFIED: Show if status is empty OR one of the single states
+            const maritalVisible = (status === '' || ['Single', 'Divorced', 'Legally Separated', 'Widowed'].includes(status));
 
             if (categoryVisible && maritalVisible) {
                 sectionE.classList.remove('hidden');
@@ -994,7 +1046,8 @@
                     </div>
                     <!-- MODIFIED: Added id="maritalChangeDate" and class="hidden" -->
                     <div id="maritalChangeDate" class="hidden flex items-end space-x-2 w-full max-w-xs">
-                        <label class="text-gray-500 font-medium whitespace-nowrap flex-shrink-0">If yes, date:</label>
+                        <!-- MODIFIED: Text changed to "date of the change" -->
+                        <label class="text-gray-500 font-medium whitespace-nowrap flex-shrink-0">date of the change:</label>
                         <input type="date" class="form-input-line w-full text-sm">
                     </div>
                 </div>
@@ -1132,7 +1185,8 @@
                                             </div>
                                             <div class="label-input-group flex-grow">
                                                 <label class="block text-gray-500 font-medium text-xs">Amount</label>
-                                                <input type="text" class="form-input-line w-full" placeholder="0.00">
+                                                <!-- MODIFIED: Added oninput event handler -->
+                                                <input type="text" class="form-input-line w-full" placeholder="0.00" oninput="onNumberInput(event)">
                                             </div>
                                         </div>
                                     </div>
@@ -1293,7 +1347,8 @@
                                     </div>
                                     <div class="label-input-group">
                                         <label class="block text-gray-500 font-medium">Amount per annum</label>
-                                        <input type="text" class="form-input-line w-full" placeholder="0.00">
+                                        <!-- MODIFIED: Added oninput event handler -->
+                                        <input type="text" class="form-input-line w-full" placeholder="0.00" oninput="onNumberInput(event)">
                                     </div>
                                 </div>
                             </div>
