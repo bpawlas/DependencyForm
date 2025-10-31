@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UNOPS Dependency Status Questionnaire (P.84)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles to simulate a physical notebook/form */
+        body {
+            font-family: 'Open Sans', sans-serif; /* Updated to Open Sans */
+            background-color: #f7f7f7; /* Light background */
+            padding: 20px;
+        }
+
+        .notebook-page {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: #ffffff; /* White paper */
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 3rem;
+            min-height: 100vh;
+        }
+
+        /* Line under inputs to simulate handwriting */
+        .form-input-line {
+            border: none;
+            border-bottom: 1px solid #ccc;
+            padding: 4px 0;
+            margin-top: 4px;
+            transition: border-bottom-color 0.2s;
+            /* Ensure font and size consistency for alignment */
+            font-size: 0.875rem; /* text-sm equivalent */
+            line-height: 1.25rem;
+            color: #1f2937; /* dark text */
+            background-color: transparent;
+        }
+
+        .form-input-line:focus {
+            border-bottom-color: #059669; /* Green focus/accent color */
+            outline: none;
+        }
+
+        /* Section header colors (UNOPS Blue/Green Accent) */
+        /* Note: This is used for Section A which is not collapsible */
+        .section-header {
+            background-color: #eff6ff; /* Light Blue */
+            border-left: 5px solid #059669; /* Green Accent */
+            color: #1e40af; /* Dark Blue Text */
+            padding: 0.5rem 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+
+        /* Styling for the collapsable sections */
+        .collapsible-section {
+            /* The default border-bottom is applied here, which is removed for D->E transition below */
+        }
+        .collapsible-section summary {
+            /* Remove default marker */
+            list-style: none;
+            cursor: pointer;
+            padding: 0;
+            margin: 0;
+        }
+        .collapsible-section summary::-webkit-details-marker {
+            display: none;
+        }
+        
+        /* Style the summary to look like the section header but clickable */
+        .collapsible-section summary h3 {
+            /* Updated to move chevron to the left */
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 1rem; /* Space between chevron and text */
+            margin-bottom: 0; 
+            padding: 0.5rem 1rem;
+            background-color: #eff6ff;
+            border-left: 5px solid #059669;
+            color: #1e40af;
+            border-radius: 4px;
+        }
+        
+        /* Style the chevron icon */
+        .collapsible-section .chevron-icon {
+            flex-shrink: 0;
+            margin-right: -0.5rem; /* Pull chevron slightly closer to the title text */
+        }
+
+        /* Rotate chevron icon when open */
+        .collapsible-section[open] .chevron-icon {
+            transform: rotate(180deg);
+        }
+
+        /* Print media styles for "PDF" download */
+        @media print {
+            body {
+                background-color: white !important;
+                padding: 0 !important;
+            }
+            .notebook-page {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 1rem !important;
+                min-height: auto !important;
+                max-width: 100% !important;
+            }
+            .no-print {
+                display: none !important;
+            }
+            
+            /* --- FORCE ALL COLLAPSIBLES TO OPEN AND SHOW HEADERS --- */
+            .collapsible-section {
+                display: block !important;
+                border-bottom: none !important; /* Remove separator line */
+            }
+            .collapsible-section summary {
+                display: block !important; /* Ensure the summary (header) is visible */
+                margin-bottom: 0.5rem !important;
+            }
+            .collapsible-section summary h3 {
+                /* Make header visible but minimalist in print */
+                border-left: 5px solid #059669 !important; /* Retain green line */
+                background-color: #f0f0f0 !important; /* Light background for visibility */
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            .collapsible-section .chevron-icon {
+                display: none; /* Hide chevron icon */
+            }
+            .collapsible-section details > div {
+                display: block !important; /* Ensure content is displayed */
+            }
+            /* --- END FORCE COLLAPSIBLES --- */
+
+
+            /* Ensure inputs look like printed text */
+            .form-input-line {
+                border: none !important;
+                border-bottom: 1px solid black !important;
+                resize: none !important;
+            }
+            .form-input-line:focus {
+                border-bottom: 1px solid black !important;
+                box-shadow: none !important;
+            }
+             /* UPDATED: Ensure textarea expands to show all content when printing */
+            .form-textarea {
+                border: none !important;
+                border-bottom: 1px solid black !important;
+                resize: none !important;
+                height: auto !important; /* Allow height to expand */
+                overflow: visible !important; /* Show overflow */
+            }
+            
+            input[type="checkbox"], input[type="radio"] {
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+                background-color: #fff !important;
+                border: 1px solid black !important;
+                appearance: auto !important;
+            }
+            /* Hide the green line accent in print for the static header */
+            .section-header {
+                border-left: 5px solid #059669 !important;
+                background-color: #f0f0f0 !important;
+                color: #000 !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+
+            /* Ensure the grant section prints cleanly */
+            .grant-row td { /* This class is no longer used, but kept for safety */
+                padding: 0 !important;
+            }
+            .grant-container {
+                border: 1px solid #ccc !important;
+                padding: 8px !important;
+                margin: 0 !important;
+                background-color: #fff !important;
+                -webkit-print-color-adjust: exact;
+                color-adjust: exact;
+            }
+            .grant-container .grid {
+                display: grid !important;
+            }
+            
+            /* Print style for the red warning text */
+            .text-red-600 {
+                color: #000 !important; /* Print as black */
+            }
+            
+            /* Ensure the certification text uses the standard font for printing */
+            .certification-text {
+                font-family: 'Open Sans', sans-serif !important;
+                font-style: italic !important;
+            }
+            
+            /* Ensure new child entries print clearly */
+            .child-entry {
+                page-break-inside: avoid !important;
+                border: 1px solid #ccc !important;
+                padding: 1rem !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            /* Ensure conditionally hidden items are visible in print if they have data */
+            .hidden {
+                 /* This is tricky; for now, JS opens sections, which is better */
+            }
+
+            /* --- NEW SIGNATURE CSS FOR PRINT --- */
+            .signature-image-container {
+                display: block !important; /* Forces the image to be visible on print */
+            }
+        }
+
+        /* Styling for the required checkbox/radio */
+        input[type="checkbox"]:checked, input[type="radio"]:checked {
+            border-color: #059669;
+            background-color: #059669;
+        }
+
+        /* Custom style for the year dropdown arrow to make it visible */
+        .year-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3e%3cpath d='M7 10l5-5 5 5H7z' fill='%236B7280'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            padding-left: 0;
+        }
+        
+        /* Custom class for aligning label and input vertically */
+        .label-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .header-grid > div:last-child .form-input-line {
+            max-width: 180px; /* Smaller width for Organization field */
+        }
+
+        .header-grid > div label {
+            line-height: 1.25rem; /* Ensure label height matches for alignment */
+        }
+        
+        .compact-question-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap; /* Allows wrapping on smaller screens */
+            gap: 1rem;
+            padding-bottom: 0.5rem;
+        }
+        
+        .compact-question-row > label {
+            flex-shrink: 0;
+        }
+        
+        /* Specific styling for Question 4 layout */
+        .question-4-row {
+            display: flex;
+            align-items: flex-end; /* Align inputs to the bottom line */
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-bottom: 0.5rem; 
+        }
+
+        .question-4-row .question-label {
+            flex-shrink: 0;
+            max-width: 60%; /* Allow question to take up to 60% of width */
+        }
+
+        .question-4-row .input-group {
+            display: flex;
+            gap: 1rem;
+            flex-grow: 1; /* Allows the inputs container to take remaining space */
+            border-left: 1px solid #e5e7eb; /* Subtle separator */
+            padding-left: 1rem;
+            min-width: fit-content; /* Ensure inputs don't collapse too much */
+        }
+
+        /* Styling for the grants section inside the table rows */
+        /* This class is now on the grants container div */
+        .grant-container {
+            border: 1px solid #d1d5db; /* Subtle border for the grant block */
+            background-color: #f9fafb; /* Lighter background for the block */
+            padding: 1rem;
+            margin-top: 1rem; /* Space it from the questions */
+        }
+
+        /* REMOVED: Old table-specific CSS for Section C */
+
+        /* --- NEW SIGNATURE CSS --- */
+        /* Hides the signature image container by default */
+        .signature-image-container {
+            display: none;
+            border-bottom: 1px solid #ccc; /* Mimics the form line */
+            min-height: 100px; /* Ensures space is reserved on print */
+        }
+        
+        .signature-image-container img {
+            max-height: 100px; /* Constrains signature height */
+            width: auto;
+        }
+        
+    </style>
+    <script>
+        /**
+         * Returns today's date in YYYY-MM-DD format,
+         * required for <input type="date"> default value.
+         * @returns {string} Today's date string.
+         */
+        const getTodayDate = () => {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
+
+        /**
+         * Resets the entire form fields.
+         */
+        const resetForm = () => {
+            document.getElementById('dependencyForm').reset();
+            // Re-populate children rows as reset() doesn't handle dynamic removals
+            // MODIFIED: Now targets the div container
+            const childrenContainer = document.getElementById('dependentChildrenBody');
+            childrenContainer.innerHTML = '';
+            // Ensure at least one row exists after reset
+            addChildRow(); 
+            // Ensure year dropdown selection is reset
+            populateYearDropdown();
+            // Ensure country dropdown is reset
+            populateCountriesDropdown();
+            // Ensure date field is reset to today in YYYY-MM-DD format
+            document.getElementById('signatureDate').value = getTodayDate();
+            // Collapse all sections on reset
+            document.querySelectorAll('.collapsible-section').forEach(section => {
+                section.removeAttribute('open');
+            });
+            // Ensure modal is hidden on reset
+            closeModal();
+            // NEW: Ensure single parent note modal is hidden on reset
+            closeSingleParentNoteModal();
+            // NEW: Ensure spouse allowance note modal is hidden on reset
+            closeSpouseAllowanceNoteModal();
+            // Ensure conditional field in Section E is hidden
+            document.getElementById('financialSupportDetails').classList.add('hidden');
+            // MODIFIED: Ensure Spouse Section is VISIBLE on reset (matching the default empty state)
+            document.getElementById('section-b-wrapper').classList.remove('hidden');
+            // MODIFIED: Ensure Section E is HIDDEN on reset (as marital status is blank)
+            document.getElementById('section-e-wrapper').classList.add('hidden');
+            
+            // NEW: Hide conditional spouse fields on reset
+            document.getElementById('spouseAgencyDetails').classList.add('hidden');
+            document.getElementById('spouseAllowanceDetails').classList.add('hidden');
+            document.getElementById('spouseEarningsDetails').classList.add('hidden');
+
+            // --- NEW: Hide marital status date field on reset ---
+            document.getElementById('maritalChangeDate').classList.add('hidden');
+            
+            // --- NEW: Reset signature field ---
+            removeSignature();
+        };
+
+        /**
+         * Populates the year dropdown (2016 to 2040).
+         */
+        const populateYearDropdown = () => {
+            const select = document.getElementById('applicableYear');
+            select.innerHTML = ''; // Clear existing options
+            const currentYear = new Date().getFullYear();
+            const startYear = 2016;
+            const endYear = 2040;
+
+            // Add placeholder option
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = "";
+            placeholderOption.textContent = "Select Year";
+            select.appendChild(placeholderOption);
+
+            for (let year = endYear; year >= startYear; year--) {
+                const option = document.createElement('option');
+                option.value = year;
+                option.textContent = year;
+                if (year === currentYear) {
+                    option.selected = true; // Set current year as default
+                }
+                select.appendChild(option);
+            }
+        };
+
+        /**
+         * NEW: Populates the emergency contact country dropdown.
+         */
+        const populateCountriesDropdown = () => {
+            const select = document.getElementById('emergencyCountry');
+            if (!select) return;
+            select.innerHTML = ''; // Clear existing options
+            
+            // A comprehensive list of countries
+            const countries = [
+                "Afghanistan", "Albania", "Algeria", "Andorra", "Angola", "Antigua and Barbuda", "Argentina", "Armenia", "Australia", "Austria", "Azerbaijan",
+                "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bhutan", "Bolivia", "Bosnia and Herzegovina", "Botswana", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi",
+                "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Central African Republic", "Chad", "Chile", "China", "Colombia", "Comoros", "Congo (Congo-Brazzaville)", "Congo (Congo-Kinshasa)", "Costa Rica", "Cote d'Ivoire", "Croatia", "Cuba", "Cyprus", "Czechia (Czech Republic)",
+                "Denmark", "Djibouti", "Dominica", "Dominican Republic",
+                "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini (fmr. Swaziland)", "Ethiopia",
+                "Fiji", "Finland", "France",
+                "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Greece", "Grenada", "Guatemala", "Guinea", "Guinea-Bissau", "Guyana",
+                "Haiti", "Holy See", "Honduras", "Hungary",
+                "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy",
+                "Jamaica", "Japan", "Jordan",
+                "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan",
+                "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg",
+                "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Mauritania", "Mauritius", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Morocco", "Mozambique", "Myanmar (formerly Burma)",
+                "Namibia", "Nauru", "Nepal", "Netherlands", "New Zealand", "Nicaragua", "Niger", "Nigeria", "North Korea", "North Macedonia (fmr. Macedonia)", "Norway",
+                "Oman",
+                "Pakistan", "Palau", "Palestine State", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Poland", "Portugal",
+                "Qatar",
+                "Romania", "Russia", "Rwanda",
+                "Saint Kitts and Nevis", "Saint Lucia", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Sweden", "Switzerland", "Syria",
+                "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Tuvalu",
+                "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan",
+                "Vanuatu", "Venezuela", "Vietnam",
+                "Yemen",
+                "Zambia", "Zimbabwe"
+            ];
+
+            // Add placeholder option
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = "";
+            placeholderOption.textContent = "Select Country";
+            select.appendChild(placeholderOption);
+
+            countries.forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                select.appendChild(option);
+            });
+        };
+
+        /**
+         * Simulates downloading the data as a PDF by triggering the browser's print function.
+         */
+        const downloadPDF = () => {
+            // Check for modern print support, which includes "Save as PDF" option.
+            if (typeof window.print === 'function') {
+                // IMPORTANT: Ensure all sections are expanded before printing
+                document.querySelectorAll('.collapsible-section').forEach(section => {
+                    section.setAttribute('open', '');
+                });
+                window.print();
+            } else {
+                // Using a custom message box instead of alert() as per instructions
+                console.error("Browser does not support the print function.");
+            }
+        };
+
+        /**
+         * Generates the HTML for the 12 monthly grant input fields (now text fields for Currency/Amount).
+         * @param {string} uniqueId - Unique ID for input names.
+         * @returns {string} HTML string for the grant section.
+         */
+        const generateMonthlyGrantsHTML = (uniqueId) => {
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            let inputsHtml = '';
+
+            months.forEach(month => {
+                inputsHtml += `
+                    <div class="label-input-group">
+                        <label class="block text-gray-700 text-xs">${month}:</label>
+                        <input type="text" name="child_${uniqueId}_grant_${month.toLowerCase()}" class="form-input-line w-full text-sm" placeholder="e.g., USD 100.00">
+                    </div>
+                `;
+            });
+
+            return `
+                <div class="grant-container w-full">
+                    <h5 class="font-semibold text-blue-800 mb-2 text-sm">Monthly Government Grants</h5>
+                    <div class="grid grid-cols-4 gap-4 text-sm">
+                        ${inputsHtml}
+                    </div>
+                </div>
+            `;
+        };
+
+
+        /**
+         * MODIFIED: Adds a new "block" for a Dependent Child.
+         */
+        const addChildRow = () => {
+            const container = document.getElementById('dependentChildrenBody');
+            const uniqueId = 'child_' + Math.random().toString(36).substring(2, 9); 
+
+            // Create the main wrapper for this child entry
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'child-entry border border-gray-200 rounded-lg p-4 space-y-4 mb-4';
+            entryDiv.setAttribute('data-child-id', uniqueId);
+
+            let html = `
+                <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium text-sm">Full name</label>
+                        <input type="text" name="${uniqueId}_name" class="form-input-line w-full text-sm font-bold" placeholder="Full Name" required>
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium text-sm">Date of Birth</label>
+                        <input type="date" name="${uniqueId}_dob" class="form-input-line w-full text-sm" required onchange="checkChildAge('${uniqueId}', this.value)">
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium text-sm">Gender</label>
+                        <select name="${uniqueId}_gender" class="form-input-line w-full text-sm py-1 appearance-none bg-white year-select">
+                            <option value="">Select</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                        </select>
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium text-sm">Status</label>
+                        <select name="${uniqueId}_status" class="form-input-line w-full text-sm py-1 appearance-none bg-white year-select" onchange="toggleResideQuestion('${uniqueId}', this.value)">
+                            <option value="">Select</option>
+                            <option value="Biological" selected>Biological</option>
+                            <option value="Adopted">Adopted</option>
+                            <option value="Stepchild">Stepchild</option>
+                        </select>
+                    </div>
+                    <div class="label-input-group justify-center pt-5">
+                        <label class="flex items-center text-gray-700 font-medium text-sm">
+                            <input type="checkbox" name="${uniqueId}_disabled" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 mr-2">
+                            Disabled
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-100 pt-4 space-y-4">
+                    <div class="compact-question-row">
+                        <label class="text-gray-700 font-medium flex-shrink-0">Do you provide the child with main and continuing support?</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_support" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_support" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+
+                    <div id="${uniqueId}_attendance_question" class="compact-question-row hidden">
+                        <label class="text-gray-700 font-medium flex-shrink-0">If the child has reached age 18, indicate if in full-time attendance at school</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_attendance" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_attendance" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+
+                    <div id="${uniqueId}_reside_question" class="compact-question-row hidden">
+                        <label class="text-gray-700 font-medium flex-shrink-0">Does your child reside with you?</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_reside" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_reside" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+
+                    <div class="compact-question-row">
+                        <label class="text-gray-700 font-medium flex-shrink-0">Is your child married?</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_married" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_married" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // NEW: Add the Grants Question
+             html += `
+                <div class="compact-question-row pt-4">
+                    <label class="text-gray-700 font-medium flex-shrink-0">Did you or your spouse receive any government grants?</label>
+                    <div class="flex space-x-4">
+                        <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_received_grants" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleGrantsBox('${uniqueId}', this.value)"> <span class="ml-2 text-gray-600">Yes</span></label>
+                        <label class="inline-flex items-center"><input type="radio" name="${uniqueId}_received_grants" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleGrantsBox('${uniqueId}', this.value)"> <span class="ml-2 text-gray-600">No</span></label>
+                    </div>
+                </div>
+            `;
+
+            // NEW: Add the Grants Section HTML (wrapped in a conditional div)
+            html += `<div id="${uniqueId}_grants_box" class="hidden">`;
+            html += generateMonthlyGrantsHTML(uniqueId);
+            html += `</div>`;
+            
+            // Add the Delete Button
+            html += `
+                <div class="flex justify-end pt-4 no-print border-t border-gray-100 mt-4">
+                    <button type="button" onclick="deleteChildRow(this)" class="text-red-500 hover:text-red-700 transition duration-150 text-sm font-medium p-1 rounded hover:bg-red-50">
+                        Delete This Entry
+                    </button>
+                </div>
+            `;
+
+            entryDiv.innerHTML = html;
+            container.appendChild(entryDiv);
+        };
+
+
+        /**
+         * MODIFIED: Deletes a Dependent Child "block".
+         * @param {HTMLElement} buttonElement - The delete button that was clicked.
+         */
+        const deleteChildRow = (buttonElement) => {
+            // Find the closest parent 'child-entry' div and remove it
+            buttonElement.closest('.child-entry').remove();
+        };
+
+        /**
+         * Toggles the visibility of the permanent residency modal.
+         * @param {string} value - The value of the selected radio button ('Yes' or 'No').
+         */
+        const toggleModal = (value) => {
+            if (value === 'Yes') {
+                document.getElementById('residencyModal').classList.remove('hidden');
+            } else {
+                closeModal();
+            }
+        };
+
+        /**
+         * Hides the permanent residency modal.
+         */
+        const closeModal = () => {
+            document.getElementById('residencyModal').classList.add('hidden');
+        };
+
+        /**
+         * NEW: Hides the single parent allowance note modal.
+         */
+        const closeSingleParentNoteModal = () => {
+            document.getElementById('singleParentNoteModal').classList.add('hidden');
+        };
+
+        /**
+         * NEW: Hides the spouse allowance note modal.
+         */
+        const closeSpouseAllowanceNoteModal = () => {
+            document.getElementById('spouseAllowanceNoteModal').classList.add('hidden');
+        };
+
+        /**
+         * Toggles the visibility of the financial support details in Section E.
+         * @param {string} value - The value of the selected radio button ('Yes' or 'No').
+         */
+        const toggleFinancialSupportDetails = (value) => {
+            const detailsSection = document.getElementById('financialSupportDetails');
+            if (value === 'Yes') {
+                detailsSection.classList.remove('hidden');
+                // NEW: Show the note modal when 'Yes' is selected
+                document.getElementById('singleParentNoteModal').classList.remove('hidden');
+            } else {
+                detailsSection.classList.add('hidden');
+            }
+        };
+        
+        /**
+         * Toggles the visibility of the Spouse Section (B) based on marital status.
+         * @param {string} status - The selected marital status value.
+         */
+        const toggleSpouseSection = (status) => {
+            const spouseSection = document.getElementById('section-b-wrapper');
+            // MODIFIED: Added '' (empty string) to keep section visible by default
+            const applicableStates = ['Married', 'Legally Separated', 'Common-Law', ''];
+            
+            if (applicableStates.includes(status)) {
+                spouseSection.classList.remove('hidden');
+            } else {
+                spouseSection.classList.add('hidden');
+                // Optional: We might want to close the <details> tag if it was left open
+                document.getElementById('section-b').removeAttribute('open');
+            }
+        };
+        
+        /**
+         * MODIFIED: Toggles the visibility of the Single Parent Allowance Section (E) 
+         * based on BOTH appointment category and marital status.
+         */
+        const updateSectionEVisibility = () => {
+            const sectionE = document.getElementById('section-e-wrapper');
+            
+            // Condition 1: Appointment Category must be International Professional or empty
+            const category = document.getElementById('appointmentCategory').value;
+            const categoryVisible = !['General Service', 'National Officer'].includes(category);
+            
+            // Condition 2: Marital Status must be Single, Divorced, Legally Separated, or Widowed
+            const status = document.getElementById('staffMaritalStatus').value;
+            const maritalVisible = ['Single', 'Divorced', 'Legally Separated', 'Widowed'].includes(status);
+
+            if (categoryVisible && maritalVisible) {
+                sectionE.classList.remove('hidden');
+            } else {
+                sectionE.classList.add('hidden');
+                // Optional: Close the details tag
+                document.getElementById('section-e').removeAttribute('open');
+            }
+        };
+
+        /**
+         * NEW: Toggles visibility of spouse agency details.
+         * @param {string} value - The value of the selected radio button ('Yes' or 'No').
+         */
+        const toggleSpouseAgency = (value) => {
+            const details = document.getElementById('spouseAgencyDetails');
+            if (value === 'Yes') {
+                details.classList.remove('hidden');
+            } else {
+                details.classList.add('hidden');
+            }
+        };
+
+        /**
+         * NEW: Toggles visibility of spouse allowance questions 2, 3, and 4.
+         * @param {string} value - The value of the selected radio button ('Yes' or 'No').
+         */
+        const toggleSpouseAllowanceDetails = (value) => {
+            const details = document.getElementById('spouseAllowanceDetails');
+            if (value === 'Yes') {
+                details.classList.remove('hidden');
+                // NEW: Show the spouse allowance note modal
+                document.getElementById('spouseAllowanceNoteModal').classList.remove('hidden');
+            } else {
+                details.classList.add('hidden');
+            }
+        };
+
+        /**
+         * NEW: Toggles visibility of spouse earnings (Q4) based on Q2 or Q3.
+         */
+        const toggleSpouseEarnings = () => {
+            const q2Yes = document.querySelector('input[name="spouse_present_employed"]:checked')?.value === 'Yes';
+            const q3Yes = document.querySelector('input[name="spouse_fiscal_employed"]:checked')?.value === 'Yes';
+            const earningsDetails = document.getElementById('spouseEarningsDetails');
+            
+            if (q2Yes || q3Yes) {
+                earningsDetails.classList.remove('hidden');
+            } else {
+                earningsDetails.classList.add('hidden');
+            }
+        };
+        
+        /**
+         * NEW: Toggles visibility of the "Reside with you?" question based on child's status.
+         * @param {string} uniqueId - The unique ID of the child entry.
+         * @param {string} status - The selected status value ('Adopted', 'Biological', 'Stepchild').
+         */
+        const toggleResideQuestion = (uniqueId, status) => {
+            const resideQuestion = document.getElementById(`${uniqueId}_reside_question`);
+            // MODIFIED: Changed from 'Adopted' to 'Stepchild'
+            if (status === 'Stepchild') {
+                resideQuestion.classList.remove('hidden');
+            } else {
+                resideQuestion.classList.add('hidden');
+            }
+        };
+
+        /**
+         * NEW: Toggles visibility of the grants box based on radio button selection.
+         * @param {string} uniqueId - The unique ID of the child entry.
+         * @param {string} value - The value of the selected radio button ('Yes' or 'No').
+         */
+        const toggleGrantsBox = (uniqueId, value) => {
+            const grantsBox = document.getElementById(`${uniqueId}_grants_box`);
+            if (value === 'Yes') {
+                grantsBox.classList.remove('hidden');
+            } else {
+                grantsBox.classList.add('hidden');
+            }
+        };
+
+        /**
+         * NEW: Checks the age of a child based on DOB and applicable year.
+         * Toggles the visibility of the "full-time attendance" question.
+         * @param {string} uniqueId - The unique ID of the child entry.
+         * @param {string} dobString - The date of birth string (YYYY-MM-DD).
+         */
+        const checkChildAge = (uniqueId, dobString) => {
+            const applicableYearStr = document.getElementById('applicableYear').value;
+            const attendanceQuestion = document.getElementById(`${uniqueId}_attendance_question`);
+            
+            if (!dobString || !applicableYearStr) {
+                attendanceQuestion.classList.add('hidden');
+                return;
+            }
+
+            try {
+                const birthDate = new Date(dobString);
+                // Adjust for timezone offset to get correct UTC date
+                birthDate.setMinutes(birthDate.getMinutes() + birthDate.getTimezoneOffset());
+                
+                const birthYear = birthDate.getFullYear();
+                const applicableYear = parseInt(applicableYearStr, 10);
+                
+                const age = applicableYear - birthYear;
+                
+                if (age >= 18) {
+                    attendanceQuestion.classList.remove('hidden');
+                } else {
+                    attendanceQuestion.classList.add('hidden');
+                }
+            } catch (e) {
+                console.error("Error parsing date:", e);
+                attendanceQuestion.classList.add('hidden');
+            }
+        };
+
+        /**
+         * NEW: Runs the age check for all existing children.
+         * Called when the applicable year changes.
+         */
+        const checkAllChildAges = () => {
+            const dobInputs = document.querySelectorAll('input[name$="_dob"]');
+            dobInputs.forEach(input => {
+                const uniqueId = input.name.split('_')[0] + '_' + input.name.split('_')[1];
+                checkChildAge(uniqueId, input.value);
+            });
+        };
+        
+        /**
+         * NEW: Toggles the visibility of the marital status change date.
+         * @param {string} value - The value of the selected radio button ('Yes' or 'No').
+         */
+        const toggleMaritalChangeDate = (value) => {
+            const dateField = document.getElementById('maritalChangeDate');
+            if (value === 'Yes') {
+                dateField.classList.remove('hidden');
+            } else {
+                dateField.classList.add('hidden');
+            }
+        };
+
+        // --- NEW SIGNATURE FUNCTIONS ---
+
+        /**
+         * Handles the file upload for the signature.
+         * Reads the file as a Data URL and displays it in the <img> tag.
+         */
+        const handleSignatureUpload = (event) => {
+            const file = event.target.files[0];
+            const previewContainer = document.getElementById('signaturePreviewContainer');
+            const previewImage = document.getElementById('signaturePreview');
+
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                
+                reader.onload = (e) => {
+                    previewImage.src = e.target.result;
+                    // Manually set the container to display:block so the user
+                    // can see what they uploaded. It's already set to
+                    // display:block for printing via CSS.
+                    previewContainer.style.display = 'block'; 
+                };
+                
+                reader.readAsDataURL(file);
+            } else {
+                // Not an image file
+                removeSignature();
+            }
+        };
+
+        /**
+         * Clears the signature preview and resets the file input.
+         */
+        const removeSignature = () => {
+            const previewContainer = document.getElementById('signaturePreviewContainer');
+            const previewImage = document.getElementById('signaturePreview');
+            const fileInput = document.getElementById('signatureUpload');
+
+            previewImage.src = "";
+            previewContainer.style.display = 'none'; // Hide the preview
+            
+            // Check if fileInput exists before trying to reset it
+            if(fileInput) {
+                fileInput.value = null; // Reset the file input field
+            }
+        };
+
+        // --- END SIGNATURE FUNCTIONS ---
+
+
+        // Initialize form elements on page load
+        window.onload = () => {
+            // MODIFIED: Check container div for children
+            if (document.getElementById('dependentChildrenBody').children.length === 0) {
+                 addChildRow();
+            }
+            populateYearDropdown();
+            populateCountriesDropdown(); // NEW: Call to populate countries
+            // REVERTED: Set today's date as default in YYYY-MM-DD format
+            document.getElementById('signatureDate').value = getTodayDate();
+            
+            // --- NEW: Set initial conditional visibility on load ---
+            // (Note: resetForm() also handles this, but this is good for initial load)
+            updateSectionEVisibility(); // Hide Section E by default
+            document.getElementById('maritalChangeDate').classList.add('hidden'); // Hide marital date
+        };
+
+    </script>
+</head>
+<body>
+
+    <div class="no-print p-4 bg-yellow-100 border-b border-yellow-300 text-sm text-yellow-800 text-center">
+        <strong>Instructions:</strong> Complete this file and click on the "Download PDF" button. This open your browser's Print dialog, allowing you to select "Save as PDF" for a clean, document-like output. Once done, do not forget to sign the document before returning it by email to bssc.staff.admin@unops.org.
+    </div>
+
+    <div class="notebook-page">
+        <header class="mb-8 border-b-2 border-gray-100 pb-4">
+            <div class="flex justify-end items-center mb-2">
+                <div class="text-xs text-gray-500">P.84 Questionnaire on Dependency Status Form (10/2025)</div>
+            </div>
+            <h2 class="text-2xl font-semibold text-gray-700 mt-4 text-center">QUESTIONNAIRE ON DEPENDENCY STATUS (P.84)</h2>
+        </header>
+
+        <form id="dependencyForm" class="space-y-8">
+
+            <div class="grid grid-cols-1 gap-4 text-sm mb-6 header-grid">
+                <div class="label-input-group w-full md:w-1/2">
+                    <label class="block text-gray-500 font-medium whitespace-normal">Indicate the calendar year for which the information provided is applicable</label>
+                    <select id="applicableYear" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select font-bold" required onchange="checkAllChildAges()">
+                        </select>
+                </div>
+                <div class="label-input-group">
+                    <label class="block text-gray-500 font-medium">Organization</label>
+                    <input type="text" class="form-input-line text-sm w-full md:w-1/2" value="UNOPS">
+                </div>
+            </div>
+
+            <div class="space-y-6 pb-6">
+                <h3 class="section-header font-bold text-lg">A. STAFF MEMBER INFORMATION</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">First name</label>
+                        <input type="text" class="form-input-line w-full" required>
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Surname</label>
+                        <input type="text" class="form-input-line w-full font-bold" required>
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Index No. / Res. Id</label>
+                        <input type="text" class="form-input-line w-full">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Appointment Category</label>
+                        <!-- MODIFIED: onchange handler updated -->
+                        <select id="appointmentCategory" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select" onchange="updateSectionEVisibility()">
+                            <option value="">Select Category</option>
+                            <option value="International Professional">International Professional</option>
+                            <option value="General Service">General Service</option>
+                            <option value="National Officer">National Officer</option>
+                        </select>
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Duty station</label>
+                        <input type="text" class="form-input-line w-full font-bold">
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Marital status</label>
+                        <!-- MODIFIED: onchange handler updated to call both functions -->
+                        <select id="staffMaritalStatus" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select" onchange="toggleSpouseSection(this.value); updateSectionEVisibility();">
+                            <option value="">Select Status</option>
+                            <option value="Married">Married</option>
+                            <option value="Single">Single</option>
+                            <option value="Divorced">Divorced</option>
+                            <option value="Legally Separated">Legally Separated</option>
+                            <option value="Widowed">Widowed</option>
+                            <option value="Common-Law">Common-Law</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- MODIFIED: Changed from Checkbox to Radio Buttons -->
+                <div class="flex items-end space-x-8 flex-wrap">
+                    <div class="flex items-center space-x-2 flex-shrink-0">
+                        <label class="text-gray-700 font-medium whitespace-nowrap">Was there a change in your marital status during this year?</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="marital_change" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleMaritalChangeDate(this.value)"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="marital_change" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleMaritalChangeDate(this.value)"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+                    <!-- MODIFIED: Added id="maritalChangeDate" and class="hidden" -->
+                    <div id="maritalChangeDate" class="hidden flex items-end space-x-2 w-full max-w-xs">
+                        <label class="text-gray-500 font-medium whitespace-nowrap flex-shrink-0">If yes, date:</label>
+                        <input type="date" class="form-input-line w-full text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 border-t pt-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Are you a permanent resident of the country of your current duty station?</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="perm_resident" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleModal(this.value)"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="perm_resident" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleModal(this.value)"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Has your permanent residence status changed in the past 12 months?</label>
+                        <div class="flex space-x-4">
+                            <label class="inline-flex items-center"><input type="radio" name="residence_change" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                            <label class="inline-flex items-center"><input type="radio" name="residence_change" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-lg">
+                    <div class="space-y-4 pt-4">
+                        <label class="block text-gray-700 font-bold mb-2">Person to be notified in case of accident</label>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="label-input-group">
+                                <label class="block text-gray-500 font-medium">Full Name</label>
+                                <input type="text" class="form-input-line w-full">
+                            </div>
+                            <div class="label-input-group">
+                                <label class="block text-gray-500 font-medium">Telephone</label>
+                                <input type="tel" class="form-input-line w-full">
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                            <div class="label-input-group">
+                                <label class="block text-gray-500 font-medium">Country of residence</label>
+                                <select id="emergencyCountry" class="form-input-line w-full text-sm appearance-none py-1 cursor-pointer year-select bg-gray-100">
+                                    </select>
+                            </div>
+                             <div class="label-input-group">
+                                <label class="block text-gray-500 font-medium">Email</label>
+                                <input type="email" class="form-input-line w-full">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="section-b-wrapper" class="">
+                <details class="collapsible-section" id="section-b">
+                    <summary>
+                        <h3 class="font-bold text-lg">
+                            <svg class="chevron-icon h-5 w-5 text-green-600 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            B. SPOUSE
+                        </h3>
+                    </summary>
+                    <div class="space-y-6 pt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="label-input-group">
+                                <label class="block text-gray-500 font-medium">First name</label>
+                                <input type="text" class="form-input-line w-full">
+                            </div>
+                            <div class="label-input-group">
+                                <label class="block text-gray-500 font-medium">Surname</label>
+                                <input type="text" class="form-input-line w-full">
+                            </div>
+                        </div>
+                        
+                        <div class="pt-4">
+                            <h4 class="font-semibold text-gray-700">UN Appointment Status</h4>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-6 pt-4">
+                                <label class="text-gray-700 font-medium flex-shrink-0">Is/has your spouse ever been employed by either the United Nations or a specialized agency?</label>
+                                <div class="flex space-x-4">
+                                    <label class="inline-flex items-center"><input type="radio" name="spouse_un_employed" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleSpouseAgency(this.value)"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="spouse_un_employed" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleSpouseAgency(this.value)"> <span class="ml-2 text-gray-600">No</span></label>
+                                </div>
+                            </div>
+
+                            <div id="spouseAgencyDetails" class="hidden grid grid-cols-2 gap-6 pl-6 pt-2">
+                                <div class="label-input-group">
+                                    <label class="block text-gray-500 font-medium">If yes, please indicate agency</label>
+                                    <input type="text" class="form-input-line w-full">
+                                </div>
+                                <div class="label-input-group">
+                                    <label class="block text-gray-500 font-medium">Dates of appointment</label>
+                                    <input type="text" class="form-input-line w-full" placeholder="e.g., YYYY-YYYY">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space-y-4 pt-4">
+                            <h4 class="font-semibold text-gray-700 mb-4">Dependency Allowance for Spouse</h4>
+                            
+                            <div class="compact-question-row">
+                                <label class="text-gray-700 font-medium flex-shrink-0">1. Are you attempting to claim dependency allowance on behalf of your spouse?</label>
+                                <div class="flex space-x-4">
+                                    <label class="inline-flex items-center"><input type="radio" name="claim_spouse" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleSpouseAllowanceDetails(this.value)"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                    <label class="inline-flex items-center"><input type="radio" name="claim_spouse" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleSpouseAllowanceDetails(this.value)"> <span class="ml-2 text-gray-600">No</span></label>
+                                </div>
+                            </div>
+                            
+                            <div id="spouseAllowanceDetails" class="hidden space-y-4">
+                                <div class="compact-question-row">
+                                    <label class="text-gray-700 font-medium flex-shrink-0">2. Is your spouse presently employed?</label>
+                                    <div class="flex space-x-4">
+                                        <label class="inline-flex items-center"><input type="radio" name="spouse_present_employed" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleSpouseEarnings()"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                        <label class="inline-flex items-center"><input type="radio" name="spouse_present_employed" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleSpouseEarnings()"> <span class="ml-2 text-gray-600">No</span></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="compact-question-row">
+                                    <label class="text-gray-700 font-medium flex-shrink-0">3. Was your spouse ever employed during the present or previous fiscal year?</label>
+                                    <div class="flex space-x-4">
+                                        <label class="inline-flex items-center"><input type="radio" name="spouse_fiscal_employed" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleSpouseEarnings()"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                        <label class="inline-flex items-center"><input type="radio" name="spouse_fiscal_employed" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleSpouseEarnings()"> <span class="ml-2 text-gray-600">No</span></label>
+                                    </div>
+                                </div>
+
+                                <div id="spouseEarningsDetails" class="hidden">
+                                    <div class="flex items-end flex-wrap gap-4 pt-2 w-full">
+                                        <label class="question-label text-gray-700 font-medium whitespace-normal leading-normal">4. If yes to (2) or (3) above, spouse's gross occupational earnings per annum:</label>
+                                        
+                                        <div class="flex-grow flex items-end space-x-4 border-l border-gray-200 pl-4 min-w-[300px]">
+                                            <div class="label-input-group w-24">
+                                                <label class="block text-gray-500 font-medium text-xs">Currency</label>
+                                                <input type="text" class="form-input-line w-full" placeholder="e.g., USD, EUR">
+                                            </div>
+                                            <div class="label-input-group flex-grow">
+                                                <label class="block text-gray-500 font-medium text-xs">Amount</label>
+                                                <input type="text" class="form-input-line w-full" placeholder="0.00">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <p class="text-xs italic text-red-600">
+                                    (Attach proof of earnings, e.g. W-2 form, income tax returns or certification of earnings from the employer to the email when returning this completed form)
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </details>
+            </div>
+
+            <details class="collapsible-section" id="section-c">
+                <summary>
+                    <h3 class="font-bold text-lg">
+                        <svg class="chevron-icon h-5 w-5 text-green-600 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        C. DEPENDENT CHILDREN
+                    </h3>
+                </summary>
+                <div class="space-y-6 pt-4">
+
+                    <div id="dependentChildrenBody" class="space-y-4">
+                        </div>
+
+                    <div class="no-print">
+                        <button type="button" onclick="addChildRow()" class="mt-4 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition duration-200 shadow-md">
+                            + Add Dependent Child
+                        </button>
+                    </div>
+
+                </div>
+            </details>
+
+            <details class="collapsible-section border-b-0" id="section-d">
+                <summary>
+                    <h3 class="font-bold text-lg">
+                        <svg class="chevron-icon h-5 w-5 text-green-600 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        </svg>
+                        D. SECONDARY DEPENDENT
+                    </h3>
+                </summary>
+                <div class="space-y-6 pt-4">
+                    <div class="bg-yellow-50 border border-yellow-200 text-yellow-800 p-3 rounded-md text-sm mb-6">
+                        <p>A secondary dependent is defined by the UN as the <strong>father</strong>, <strong>mother</strong>, <strong>brother</strong> or <strong>sister</strong> of whose financial support the staff member provides on half or more, and in any case at least twice the amount of the secondary dependency allowance. More information can be found <a href="https://content.unops.org/HR-Documents/Explanatory-Notes-on-Eligibility-for-Dependency-Benefits.pdf" target="_blank" rel="noopener noreferrer" class="font-medium underline hover:text-yellow-900">here</a>.</p>
+                    </div>
+                
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="label-input-group">
+                            <label class="block text-gray-500 font-medium">Full name</label>
+                            <input type="text" class="form-input-line w-full font-bold">
+                        </div>
+                        <div class="label-input-group">
+                            <label class="block text-gray-500 font-medium">Marital status</label>
+                            <select class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select">
+                                <option value="">Select Status</option>
+                                <option value="Married">Married</option>
+                                <option value="Single">Single</option>
+                                <option value="Divorced">Divorced</option>
+                                <option value="Legally Separated">Legally Separated</option>
+                                <option value="Widowed">Widowed</option>
+                                <option value="Common-Law">Common-Law</option>
+                            </select>
+                        </div>
+                        <div class="label-input-group">
+                            <label class="block text-gray-500 font-medium">Relationship</label>
+                            <select class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select">
+                                <option value="">Select Relationship</option>
+                                <option value="Parent">Parent</option>
+                                <option value="Sibling">Sibling</option>
+                            </select>
+                        </div>
+                        <div class="label-input-group">
+                            <label class="block text-gray-500 font-medium">Date of birth</label>
+                            <input type="date" class="form-input-line w-full">
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 pt-4 border-t">
+                        <div class="flex items-center space-x-2">
+                            <label class="text-gray-700 font-medium w-full">Does the secondary dependent reside with you?</label>
+                            <div class="flex space-x-4 flex-shrink-0">
+                                <label class="inline-flex items-center"><input type="radio" name="sec_dep_reside" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                <label class="inline-flex items-center"><input type="radio" name="sec_dep_reside" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <label class="text-gray-700 font-medium w-full">Do you provide one half or more of this dependent's financial support?</label>
+                            <div class="flex space-x-4 flex-shrink-0">
+                                <label class="inline-flex items-center"><input type="radio" name="sec_dep_half_support" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                <label class="inline-flex items-center"><input type="radio" name="sec_dep_half_support" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                            </div>
+                        </div>
+                        <div class="compact-question-row">
+                            <label class="text-gray-700 font-medium flex-shrink-0 leading-tight">
+                                <span>Do you provide this dependent with at least twice the amount of the dependency allowance?</span>
+                                <span class="block text-xs italic font-bold text-red-600 mt-1">(Attach supporting documentation to the email when returning the completed form)</span>
+                            </label>
+                            <div class="flex space-x-4 flex-shrink-0">
+                                <label class="inline-flex items-center"><input type="radio" name="sec_dep_twice_allowance" class="form-radio h-4 w-4 text-green-600" value="Yes"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                <label class="inline-flex items-center"><input type="radio" name="sec_dep_twice_allowance" class="form-radio h-4 w-4 text-green-600" value="No"> <span class="ml-2 text-gray-600">No</span></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </details>
+
+            <div id="section-e-wrapper" class="">
+                <details class="collapsible-section border-b-0 border-t-0" id="section-e"> 
+                    <summary>
+                        <h3 class="font-bold text-lg">
+                            <svg class="chevron-icon h-5 w-5 text-green-600 transition-transform duration-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                            </svg>
+                            E. SINGLE PARENT ALLOWANCE STATUS
+                        </h3>
+                    </summary>
+                    <div class="space-y-6 pt-4">
+                        <p class="text-sm text-gray-600 italic">Please only complete this section if you are attempting to claim eligibility for the single parent allowance.</p>
+
+                        <label class="block text-gray-700 font-medium mb-2">If you believe you are eligible for the single parent allowance, please indicate below which household/financial situation applies to you.</label>
+
+                        <div class="space-y-2">
+                            <label class="inline-flex items-center w-full">
+                                <input type="radio" name="single_parent_status" class="form-radio h-4 w-4 text-green-600" value="Single parent"> <span class="ml-3 text-gray-600">Single parent</span>
+                            </label>
+                            <label class="inline-flex items-center w-full">
+                                <input type="radio" name="single_parent_status" class="form-radio h-4 w-4 text-green-600" value="Cohabiting custodial parent"> <span class="ml-3 text-gray-600">Cohabiting with the other custodial parent</span>
+                            </label>
+                            <label class="inline-flex items-center w-full">
+                                <input type="radio" name="single_parent_status" class="form-radio h-4 w-4 text-green-600" value="Cohabiting contributor"> <span class="ml-3 text-gray-600">Cohabitating with an individual who contributes to the provision of financial support in respect of the dependent child</span>
+                            </label>
+                        </div>
+
+                        <div class="space-y-4 pt-4 border-t">
+                            <p class="text-sm text-gray-600 italic">Please indicate all financial support that you received in respect of the dependent child (e.g. from an ex-spouse, from a cohabiting partner, from the biological parent, etc.).</p>
+
+                            <label class="block text-gray-700 font-medium">1. Did you receive any financial support in respect of the dependent child (<span class="underline">in addition</span> to the government grants already included in Section C)?</label>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center"><input type="radio" name="received_financial_support" class="form-radio h-4 w-4 text-green-600" value="Yes" onchange="toggleFinancialSupportDetails(this.value)"> <span class="ml-2 text-gray-600">Yes</span></label>
+                                <label class="inline-flex items-center"><input type="radio" name="received_financial_support" class="form-radio h-4 w-4 text-green-600" value="No" onchange="toggleFinancialSupportDetails(this.value)"> <span class="ml-2 text-gray-600">No</span></label>
+                            </div>
+
+                            <div id="financialSupportDetails" class="hidden space-y-4 pt-2">
+                                <label class="block text-gray-700 font-medium">2. If yes to (1) above, please indicate the type (e.g. child support, etc.), amount and currency:</label>
+                                <div class="grid grid-cols-3 gap-4 pl-6">
+                                    <div class="label-input-group">
+                                        <label class="block text-gray-500 font-medium">Type of support</label>
+                                        <input type="text" class="form-input-line w-full">
+                                    </div>
+                                    <div class="label-input-group">
+                                        <label class="block text-gray-500 font-medium">Currency</label>
+                                        <input type="text" class="form-input-line w-full" placeholder="e.g., USD, EUR">
+                                    </div>
+                                    <div class="label-input-group">
+                                        <label class="block text-gray-500 font-medium">Amount per annum</label>
+                                        <input type="text" class="form-input-line w-full" placeholder="0.00">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        </div>
+                </details>
+            </div>
+
+            <div class="space-y-6 pt-8 border-t-2 border-green-600/50">
+                <p class="text-sm italic text-gray-700 certification-text" style="font-family: 'Open Sans', sans-serif;">
+                    <strong>I HEREBY CERTIFY</strong> that the information provided in this questionnaire is true to the best of my knowledge and belief.
+                </p>
+
+                <div class="grid grid-cols-2 gap-6">
+                    
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Staff Member's Signature</label>
+                        
+                        <div id="signaturePreviewContainer" class="signature-image-container">
+                            <img id="signaturePreview" src="" alt="Staff Signature">
+                        </div>
+
+                        <div class="no-print mt-2 space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">
+                                Upload signature file (JPG, PNG):
+                            </label>
+                            <input type="file" id="signatureUpload" onchange="handleSignatureUpload(event)" accept="image/png, image/jpeg" class="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-md file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-green-50 file:text-green-700
+                                hover:file:bg-green-100
+                            ">
+                            
+                            <button type="button" onclick="removeSignature()" class="text-sm text-blue-600 hover:underline">
+                                Remove Signature
+                            </button>
+                        </div>
+                    </div>
+                    <div class="label-input-group">
+                        <label class="block text-gray-500 font-medium">Date</label>
+                        <input type="date" id="signatureDate" class="form-input-line w-full">
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div class="no-print mt-12 pt-6 border-t flex justify-center space-x-6">
+            <button onclick="resetForm()" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-gray-700 bg-gray-200 hover:bg-gray-300 transition duration-150 shadow-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.105 7.147L7.5 9.5a1 1 0 01-1.414 1.414L3 7.414V10a1 1 0 01-2 0V3a1 1 0 011-1h2z" clip-rule="evenodd" />
+                    <path fill-rule="evenodd" d="M12 17V10a1 1 0 011-1h7a1 1 0 110 2h-4.898A7.002 7.002 0 013.399 12.334a1 1 0 011.885-.666A5.002 5.002 0 0014.895 12.853L12.5 15.25a1 1 0 011.414 1.414l3.586-3.586V17a1 1 0 11-2 0z" clip-rule="evenodd" />
+                </svg>
+                Reset Form
+            </button>
+            <button onclick="downloadPDF()" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition duration-150 shadow-lg shadow-green-500/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.5 17a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v1a.5.5 0 01-.5.5h-8a.5.5 0 01-.5-.5v-1zM5 13a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5H5z" clip-rule="evenodd" />
+                    <path d="M11 2a2 2 0 00-2 2v3H6a2 2 0 00-2 2v5a2 2 0 002 2h8a2 2 0 002-2v-5a2 2 0 00-2-2h-3V4a2 2 0 00-2-2zM9 4a1 1 0 011-1h3a1 1 0 011 1v3h-5V4z" />
+                </svg>
+                Download PDF
+            </button>
+        </div>
+    </div>
+
+    <div id="residencyModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                                Information on Permanent Residence
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-600">
+                                    Staff Members holding permanent residence in the country of their duty station are considered locally recruited and are generally not eligible for international entitlements (e.g., Home Leave, Education Grant, Family Visit Travel, Repatriation Grant).
+                                </p>
+                                <p class="text-sm text-gray-600 mt-2">
+                                    For more information, please consult the 
+                                    <a href="https://content.unops.org/HR-Documents/International-Entitlements-One-Pager.pdf" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 font-medium underline">
+                                        International Entitlements One-Pager
+                                    </a>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="singleParentNoteModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title-note" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeSingleParentNoteModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-note">
+                                Note on Single Parent Allowance Eligibility
+                            </h3>
+                            <div class="mt-2 text-sm text-gray-600 space-y-2">
+                                <p>Please note that to be eligible for a single parent allowance any financial support received in respect of the dependent child must not exceed the higher of:</p>
+                                <ol class="list-decimal list-inside ml-2 mt-1 space-y-1">
+                                    <li>The lowest entry level of the United Nations General Service gross salary scale in force on 1 January of the year concerned at the staff member's duty station. In duty stations where more than one salary scale is in force, the most recently issued salary scale shall apply for determining the threshold amount;</li>
+                                    <li>The gross salary for the lowest entry level in force on 1 January of the year concerned at the base of the salary system (G-2, step 1, for New York).</li>
+                                </ol>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeSingleParentNoteModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="spouseAllowanceNoteModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title-spouse-note" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeSpouseAllowanceNoteModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-spouse-note">
+                                Information on Dependent Spouse Allowance
+                            </h3>
+                            <div class="mt-2 text-sm text-gray-600 space-y-3">
+                                <p>A spouse is considered dependent if his/her gross occupational earnings is below a specific limit. This limit varies based on the staff member's and spouse's location:</p>
+                                <ul class="list-disc list-inside space-y-1">
+                                    <li><strong>International Staff:</strong> The limit is the G-2, Step I gross salary in New York.</li>
+                                    <li><strong>Local Staff:</strong> The limit is the lowest entry-level General Service salary at the duty station in the <em>spouse's</em> country of work.</li>
+                                </ul>
+                                <p class="mt-2">
+                                    For detailed rules, please consult the 
+                                    <a href="https://content.unops.org/HR-Documents/Explanatory-Notes-on-Eligibility-for-Dependency-Benefits.pdf" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-800 font-medium underline">
+                                        Explanatory Notes on Eligibility for Dependency Benefits
+                                    </a>.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeSpouseAllowanceNoteModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </T>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
