@@ -334,22 +334,31 @@
         const formatNumberWithCommas = (value) => {
             if (!value) return '';
             
-            // Remove all non-digit and non-decimal characters
+            // 1. Store if a decimal point is at the end, for user typing
+            const endsWithDot = value.endsWith('.');
+            
+            // 2. Remove all non-digit and non-decimal characters
             let cleanValue = value.replace(/[^\d.]/g, '');
             
-            // Split into integer and decimal parts
-            let parts = cleanValue.split('.');
+            // 3. Ensure only one decimal point
+            const parts = cleanValue.split('.');
+            if (parts.length > 2) {
+                cleanValue = parts[0] + '.' + parts.slice(1).join('');
+            }
+            
             let integerPart = parts[0];
             let decimalPart = parts[1];
             
-            // Add commas to the integer part
+            // 4. Add commas to the integer part
             integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             
-            // Reconstruct the number
+            // 5. Reconstruct the number
             if (decimalPart !== undefined) {
                 // Allow only two decimal places
                 decimalPart = decimalPart.substring(0, 2);
                 return `${integerPart}.${decimalPart}`;
+            } else if (endsWithDot && parts.length === 1) { // Only add dot if it was the first dot
+                 return `${integerPart}.`;
             } else {
                 return integerPart;
             }
@@ -361,19 +370,22 @@
          */
         const onNumberInput = (event) => {
             const input = event.target;
-            const originalValue = input.value;
-            const cursorPosition = input.selectionStart;
+            const value = input.value;
+            const cursorStart = input.selectionStart;
+            const originalLength = value.length;
             
-            const formattedValue = formatNumberWithCommas(originalValue);
+            const formattedValue = formatNumberWithCommas(value);
             
             input.value = formattedValue;
             
-            // Adjust cursor position after formatting
-            const newCursorPosition = cursorPosition + (formattedValue.length - originalValue.length);
-            // Ensure cursor position is valid
-            if(newCursorPosition >= 0) {
-                 input.setSelectionRange(newCursorPosition, newCursorPosition);
-            }
+            const newLength = formattedValue.length;
+            
+            // Calculate new cursor position
+            // This is a simplified calculation, but should work for most cases
+            const newCursor = cursorStart + (newLength - originalLength);
+
+            // Set cursor position
+            input.setSelectionRange(newCursor, newCursor);
         };
 
 
@@ -408,8 +420,8 @@
             document.getElementById('financialSupportDetails').classList.add('hidden');
             // MODIFIED: Ensure Spouse Section is VISIBLE on reset (matching the default empty state)
             document.getElementById('section-b-wrapper').classList.remove('hidden');
-            // MODIFIED: Ensure Section E is VISIBLE on reset (as marital status is blank)
-            updateSectionEVisibility(); // This will correctly hide/show based on default blank values
+            // MODIFIED: Ensure Section E visibility is correctly set on reset
+            updateSectionEVisibility();
             
             // NEW: Hide conditional spouse fields on reset
             document.getElementById('spouseAgencyDetails').classList.add('hidden');
@@ -443,8 +455,9 @@
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
-                if (year === currentYear) {
-                    option.selected = true; // Set current year as default
+                // MODIFIED: Set 2026 as default
+                if (year === 2026) { 
+                    option.selected = true; // Set 2026 as default
                 }
                 select.appendChild(option);
             }
@@ -1186,7 +1199,7 @@
                                             <div class="label-input-group flex-grow">
                                                 <label class="block text-gray-500 font-medium text-xs">Amount</label>
                                                 <!-- MODIFIED: Added oninput event handler -->
-                                                <input type="text" class="form-input-line w-full" placeholder="0.00" oninput="onNumberInput(event)">
+                                                <input type="text" class="form-input-line w-full" placeholder="1,234.56" oninput="onNumberInput(event)">
                                             </div>
                                         </div>
                                     </div>
@@ -1348,7 +1361,7 @@
                                     <div class="label-input-group">
                                         <label class="block text-gray-500 font-medium">Amount per annum</label>
                                         <!-- MODIFIED: Added oninput event handler -->
-                                        <input type="text" class="form-input-line w-full" placeholder="0.00" oninput="onNumberInput(event)">
+                                        <input type="text" class="form-input-line w-full" placeholder="1,234.56" oninput="onNumberInput(event)">
                                     </div>
                                 </div>
                             </div>
