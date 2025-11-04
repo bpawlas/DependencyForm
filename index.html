@@ -44,6 +44,15 @@
             border-bottom-color: #059669; /* Green focus/accent color */
             outline: none;
         }
+        
+        /* NEW: Style for required fields that are empty */
+        .form-input-line.invalid {
+            border-bottom-color: #DC2626; /* Red border for invalid */
+            background-color: #FEF2F2; /* Light red background */
+        }
+        select.form-input-line.invalid {
+             border-bottom-color: #DC2626;
+        }
 
         /* Section header colors (UNOPS Blue/Green Accent) */
         /* Note: This is used for Section A which is not collapsible */
@@ -325,69 +334,6 @@
             const day = String(today.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         };
-        
-        /**
-         * NEW: Formats a number string to include commas and a decimal point.
-         * @param {string} value - The input value.
-         * @returns {string} The formatted number string.
-         */
-        const formatNumberWithCommas = (value) => {
-            if (!value) return '';
-            
-            // 1. Store if a decimal point is at the end, for user typing
-            const endsWithDot = value.endsWith('.');
-            
-            // 2. Remove all non-digit and non-decimal characters
-            let cleanValue = value.replace(/[^\d.]/g, '');
-            
-            // 3. Ensure only one decimal point
-            const parts = cleanValue.split('.');
-            if (parts.length > 2) {
-                cleanValue = parts[0] + '.' + parts.slice(1).join('');
-            }
-            
-            let integerPart = parts[0];
-            let decimalPart = parts[1];
-            
-            // 4. Add commas to the integer part
-            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            
-            // 5. Reconstruct the number
-            if (decimalPart !== undefined) {
-                // Allow only two decimal places
-                decimalPart = decimalPart.substring(0, 2);
-                return `${integerPart}.${decimalPart}`;
-            } else if (endsWithDot && parts.length === 1) { // Only add dot if it was the first dot
-                 return `${integerPart}.`;
-            } else {
-                return integerPart;
-            }
-        };
-
-        /**
-         * NEW: Event handler for formatting number inputs on the fly.
-         * @param {Event} event - The input event.
-         */
-        const onNumberInput = (event) => {
-            const input = event.target;
-            const value = input.value;
-            const cursorStart = input.selectionStart;
-            const originalLength = value.length;
-            
-            const formattedValue = formatNumberWithCommas(value);
-            
-            input.value = formattedValue;
-            
-            const newLength = formattedValue.length;
-            
-            // Calculate new cursor position
-            // This is a simplified calculation, but should work for most cases
-            const newCursor = cursorStart + (newLength - originalLength);
-
-            // Set cursor position
-            input.setSelectionRange(newCursor, newCursor);
-        };
-
 
         /**
          * Resets the entire form fields.
@@ -418,9 +364,10 @@
             closeSpouseAllowanceNoteModal();
             // Ensure conditional field in Section E is hidden
             document.getElementById('financialSupportDetails').classList.add('hidden');
+            
             // MODIFIED: Ensure Spouse Section is VISIBLE on reset (matching the default empty state)
             document.getElementById('section-b-wrapper').classList.remove('hidden');
-            // MODIFIED: Ensure Section E visibility is correctly set on reset
+            // MODIFIED: Ensure Section E is VISIBLE on reset (if category allows)
             updateSectionEVisibility();
             
             // NEW: Hide conditional spouse fields on reset
@@ -433,6 +380,11 @@
             
             // --- NEW: Reset signature field ---
             removeSignature();
+            
+            // --- NEW: Reset validation highlights ---
+             document.querySelectorAll('.form-input-line.invalid').forEach(el => {
+                el.classList.remove('invalid');
+            });
         };
 
         /**
@@ -441,7 +393,7 @@
         const populateYearDropdown = () => {
             const select = document.getElementById('applicableYear');
             select.innerHTML = ''; // Clear existing options
-            const currentYear = new Date().getFullYear();
+            const defaultYear = 2026; // MODIFIED: Default year is now 2026
             const startYear = 2016;
             const endYear = 2040;
 
@@ -455,9 +407,8 @@
                 const option = document.createElement('option');
                 option.value = year;
                 option.textContent = year;
-                // MODIFIED: Set 2026 as default
-                if (year === 2026) { 
-                    option.selected = true; // Set 2026 as default
+                if (year === defaultYear) { // MODIFIED: Set 2026 as default
+                    option.selected = true; 
                 }
                 select.appendChild(option);
             }
@@ -517,6 +468,11 @@
          * Simulates downloading the data as a PDF by triggering the browser's print function.
          */
         const downloadPDF = () => {
+            // NEW: Run validation first
+            if (!validateForm()) {
+                return; // Stop if validation fails
+            }
+            
             // Check for modern print support, which includes "Save as PDF" option.
             if (typeof window.print === 'function') {
                 // IMPORTANT: Ensure all sections are expanded before printing
@@ -712,6 +668,13 @@
         const closeSpouseAllowanceNoteModal = () => {
             document.getElementById('spouseAllowanceNoteModal').classList.add('hidden');
         };
+        
+        /**
+         * NEW: Hides the validation modal.
+         */
+        const closeValidationModal = () => {
+            document.getElementById('validationModal').classList.add('hidden');
+        };
 
         /**
          * Toggles the visibility of the financial support details in Section E.
@@ -757,10 +720,9 @@
             const category = document.getElementById('appointmentCategory').value;
             const categoryVisible = !['General Service', 'National Officer'].includes(category);
             
-            // Condition 2: Marital Status
+            // Condition 2: Marital Status must be Single, Divorced, Legally Separated, Widowed, OR EMPTY
             const status = document.getElementById('staffMaritalStatus').value;
-            // MODIFIED: Show if status is empty OR one of the single states
-            const maritalVisible = (status === '' || ['Single', 'Divorced', 'Legally Separated', 'Widowed'].includes(status));
+            const maritalVisible = ['Single', 'Divorced', 'Legally Separated', 'Widowed', ''].includes(status); // MODIFIED: Added ''
 
             if (categoryVisible && maritalVisible) {
                 sectionE.classList.remove('hidden');
@@ -951,6 +913,129 @@
         };
 
         // --- END SIGNATURE FUNCTIONS ---
+        
+        // --- NEW: NUMBER FORMATTING ---
+        /**
+         * Formats the input value to include commas for thousands and a single dot for decimals.
+         * @param {HTMLInputElement} input - The input element.
+         */
+        const formatNumberWithCommas = (input) => {
+            // Get current cursor position
+            let cursorPosition = input.selectionStart;
+            let originalLength = input.value.length;
+            
+            // 1. Clean the input value: remove all non-numeric characters except the first dot.
+            let value = input.value;
+            let cleanedValue = value.replace(/[^\d.]/g, ''); // Remove non-numeric chars
+            
+            // Ensure only one decimal point
+            let parts = cleanedValue.split('.');
+            let integerPart = parts[0];
+            let decimalPart = parts.length > 1 ? parts.slice(1).join('') : '';
+
+            // 2. Format the integer part with commas
+            let formattedInteger = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+
+            // 3. Reconstruct the value
+            let newValue = formattedInteger;
+            if (value.includes('.')) { // If user is typing decimals, keep the dot
+                newValue += '.' + decimalPart;
+            }
+
+            // 4. Set the new value and restore cursor position
+            input.value = newValue;
+            
+            // Adjust cursor position
+            let newLength = newValue.length;
+            let lengthDifference = newLength - originalLength;
+            // Only adjust cursor if it's not at the end, or if we added/removed chars
+             if (cursorPosition !== originalLength || lengthDifference !== 0) {
+                let newCursorPosition = cursorPosition + lengthDifference;
+                // Ensure cursor doesn't go negative (can happen if deleting comma)
+                if (newCursorPosition < 0) newCursorPosition = 0;
+                
+                // Check if the character right before the new cursor position is a comma
+                // If we're moving left (deleting) and land on a comma, move left again
+                if (lengthDifference < 0 && newValue.charAt(newCursorPosition - 1) === ',') {
+                    newCursorPosition--;
+                }
+                
+                // Check if we just typed a number that added a comma
+                if (lengthDifference > 0 && newValue.charAt(cursorPosition - 1) === ',') {
+                     newCursorPosition = cursorPosition + 1;
+                }
+
+                // Final safety check
+                if(newCursorPosition < 0) newCursorPosition = 0;
+                
+                input.setSelectionRange(newCursorPosition, newCursorPosition);
+            }
+        };
+
+        // --- NEW: VALIDATION FUNCTIONS ---
+        /**
+         * Validates the form for required fields before downloading PDF.
+         * @returns {boolean} - True if valid, false if not.
+         */
+        const validateForm = () => {
+            const requiredFields = [
+                { id: 'applicableYear', name: 'Applicable Year' },
+                { id: 'staffSurname', name: 'Surname (Staff Member section)' },
+                { id: 'appointmentCategory', name: 'Appointment Category (Staff Member section)' },
+                { id: 'dutyStation', name: 'Duty station (Staff Member section)' },
+                { id: 'staffMaritalStatus', name: 'Marital status (Staff Member section)' }
+            ];
+            
+            let missingFields = [];
+            let firstInvalidElement = null;
+
+            // Clear previous invalid styles
+            document.querySelectorAll('.form-input-line.invalid').forEach(el => {
+                el.classList.remove('invalid');
+            });
+
+            requiredFields.forEach(fieldInfo => {
+                const element = document.getElementById(fieldInfo.id);
+                if (element) {
+                    // Check if the element is visible (not inside a hidden container)
+                    const isVisible = !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+                    
+                    if (isVisible && (!element.value || element.value.trim() === '')) {
+                        missingFields.push(fieldInfo.name);
+                        element.classList.add('invalid'); // Add red highlight
+                        
+                        if (!firstInvalidElement) {
+                            firstInvalidElement = element;
+                        }
+                    }
+                }
+            });
+
+            if (missingFields.length > 0) {
+                // Populate and show the validation modal
+                const modal = document.getElementById('validationModal');
+                const list = document.getElementById('validationList');
+                list.innerHTML = ''; // Clear previous list
+                
+                missingFields.forEach(name => {
+                    const li = document.createElement('li');
+                    li.textContent = name;
+                    list.appendChild(li);
+                });
+                
+                modal.classList.remove('hidden');
+                
+                // Scroll to the first invalid element
+                if (firstInvalidElement) {
+                    firstInvalidElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstInvalidElement.focus();
+                }
+                
+                return false;
+            }
+
+            return true;
+        };
 
 
         // Initialize form elements on page load
@@ -966,7 +1051,7 @@
             
             // --- NEW: Set initial conditional visibility on load ---
             // (Note: resetForm() also handles this, but this is good for initial load)
-            updateSectionEVisibility(); // Hide Section E by default
+            updateSectionEVisibility(); // Hide Section E if conditions not met
             document.getElementById('maritalChangeDate').classList.add('hidden'); // Hide marital date
         };
 
@@ -991,7 +1076,8 @@
             <div class="grid grid-cols-1 gap-4 text-sm mb-6 header-grid">
                 <div class="label-input-group w-full md:w-1/2">
                     <label class="block text-gray-500 font-medium whitespace-normal">Indicate the calendar year for which the information provided is applicable</label>
-                    <select id="applicableYear" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select font-bold" required onchange="checkAllChildAges()">
+                    <!-- MODIFIED: Added 'required' attribute -->
+                    <select id="applicableYear" name="applicableYear" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select font-bold" required onchange="checkAllChildAges()">
                         </select>
                 </div>
                 <div class="label-input-group">
@@ -1006,11 +1092,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="label-input-group">
                         <label class="block text-gray-500 font-medium">First name</label>
-                        <input type="text" class="form-input-line w-full" required>
+                        <input type="text" class="form-input-line w-full" >
                     </div>
                     <div class="label-input-group">
                         <label class="block text-gray-500 font-medium">Surname</label>
-                        <input type="text" class="form-input-line w-full font-bold" required>
+                        <!-- MODIFIED: Added id, name, and 'required' -->
+                        <input type="text" id="staffSurname" name="staffSurname" class="form-input-line w-full font-bold" required>
                     </div>
                     <div class="label-input-group">
                         <label class="block text-gray-500 font-medium">Index No. / Res. Id</label>
@@ -1021,8 +1108,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="label-input-group">
                         <label class="block text-gray-500 font-medium">Appointment Category</label>
-                        <!-- MODIFIED: onchange handler updated -->
-                        <select id="appointmentCategory" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select" onchange="updateSectionEVisibility()">
+                        <!-- MODIFIED: onchange handler updated, added name and 'required' -->
+                        <select id="appointmentCategory" name="appointmentCategory" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select" onchange="updateSectionEVisibility()" required>
                             <option value="">Select Category</option>
                             <option value="International Professional">International Professional</option>
                             <option value="General Service">General Service</option>
@@ -1031,12 +1118,13 @@
                     </div>
                     <div class="label-input-group">
                         <label class="block text-gray-500 font-medium">Duty station</label>
-                        <input type="text" class="form-input-line w-full font-bold">
+                        <!-- MODIFIED: Added id, name, and 'required' -->
+                        <input type="text" id="dutyStation" name="dutyStation" class="form-input-line w-full font-bold" required>
                     </div>
                     <div class="label-input-group">
                         <label class="block text-gray-500 font-medium">Marital status</label>
-                        <!-- MODIFIED: onchange handler updated to call both functions -->
-                        <select id="staffMaritalStatus" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select" onchange="toggleSpouseSection(this.value); updateSectionEVisibility();">
+                        <!-- MODIFIED: onchange handler updated, added name and 'required' -->
+                        <select id="staffMaritalStatus" name="staffMaritalStatus" class="form-input-line w-full text-sm appearance-none bg-white py-1 cursor-pointer year-select" onchange="toggleSpouseSection(this.value); updateSectionEVisibility();" required>
                             <option value="">Select Status</option>
                             <option value="Married">Married</option>
                             <option value="Single">Single</option>
@@ -1059,7 +1147,7 @@
                     </div>
                     <!-- MODIFIED: Added id="maritalChangeDate" and class="hidden" -->
                     <div id="maritalChangeDate" class="hidden flex items-end space-x-2 w-full max-w-xs">
-                        <!-- MODIFIED: Text changed to "date of the change" -->
+                        <!-- MODIFIED: Changed label text -->
                         <label class="text-gray-500 font-medium whitespace-nowrap flex-shrink-0">date of the change:</label>
                         <input type="date" class="form-input-line w-full text-sm">
                     </div>
@@ -1198,8 +1286,8 @@
                                             </div>
                                             <div class="label-input-group flex-grow">
                                                 <label class="block text-gray-500 font-medium text-xs">Amount</label>
-                                                <!-- MODIFIED: Added oninput event handler -->
-                                                <input type="text" class="form-input-line w-full" placeholder="1,234.56" oninput="onNumberInput(event)">
+                                                <!-- MODIFIED: Added oninput formatter -->
+                                                <input type="text" class="form-input-line w-full" placeholder="0.00" oninput="formatNumberWithCommas(this)">
                                             </div>
                                         </div>
                                     </div>
@@ -1311,7 +1399,7 @@
                 </div>
             </details>
 
-            <div id="section-e-wrapper" class="">
+            <div id="section-e-wrapper" class="hidden">
                 <details class="collapsible-section border-b-0 border-t-0" id="section-e"> 
                     <summary>
                         <h3 class="font-bold text-lg">
@@ -1360,8 +1448,8 @@
                                     </div>
                                     <div class="label-input-group">
                                         <label class="block text-gray-500 font-medium">Amount per annum</label>
-                                        <!-- MODIFIED: Added oninput event handler -->
-                                        <input type="text" class="form-input-line w-full" placeholder="1,234.56" oninput="onNumberInput(event)">
+                                        <!-- MODIFIED: Added oninput formatter -->
+                                        <input type="text" class="form-input-line w-full" placeholder="0.00" oninput="formatNumberWithCommas(this)">
                                     </div>
                                 </div>
                             </div>
@@ -1419,6 +1507,7 @@
                 </svg>
                 Reset Form
             </button>
+            <!-- MODIFIED: onclick now calls validateForm() first -->
             <button onclick="downloadPDF()" class="flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition duration-150 shadow-lg shadow-green-500/50">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.5 17a.5.5 0 01.5-.5h8a.5.5 0 01.5.5v1a.5.5 0 01-.5.5h-8a.5.5 0 01-.5-.5v-1zM5 13a.5.5 0 00-.5.5v1a.5.5 0 00.5.5h10a.5.5 0 00.5-.5v-1a.5.5 0 00-.5-.5H5z" clip-rule="evenodd" />
@@ -1429,6 +1518,7 @@
         </div>
     </div>
 
+    <!-- Residency Modal -->
     <div id="residencyModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
@@ -1468,6 +1558,7 @@
         </div>
     </div>
 
+    <!-- Single Parent Note Modal -->
     <div id="singleParentNoteModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title-note" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeSingleParentNoteModal()"></div>
@@ -1503,6 +1594,7 @@
         </div>
     </div>
 
+    <!-- Spouse Allowance Note Modal -->
     <div id="spouseAllowanceNoteModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title-spouse-note" role="dialog" aria-modal="true">
         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeSpouseAllowanceNoteModal()"></div>
@@ -1539,6 +1631,43 @@
                     <button type="button" onclick="closeSpouseAllowanceNoteModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
                         Close
                     </T>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- NEW: Validation Modal -->
+    <div id="validationModal" class="hidden fixed inset-0 z-50 overflow-y-auto no-print" aria-labelledby="modal-title-validation" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeValidationModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title-validation">
+                                Missing Information
+                            </h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-600">
+                                    Please complete the following required fields before proceeding:
+                                </p>
+                                <ul id="validationList" class="list-disc list-inside mt-2 text-sm text-red-700 font-medium space-y-1">
+                                    <!-- Missing fields will be populated here by JS -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" onclick="closeValidationModal()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Close
+                    </button>
                 </div>
             </div>
         </div>
